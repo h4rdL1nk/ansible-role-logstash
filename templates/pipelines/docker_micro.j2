@@ -1,0 +1,25 @@
+input {
+  beats {
+    port => 5044
+    host => "0.0.0.0"
+  }
+}
+
+filter {
+  
+}
+
+output {
+
+      elasticsearch {
+        hosts => [ {% for node in elasticsearch_cluster_network_addresses %}"{% if elasticsearch_security_http_enabled %}https{% else %}http{% endif %}://{{ node }}:{{ elasticsearch_network_port }}"{% if loop.index != elasticsearch_cluster_network_addresses|length %},{% endif %}{% endfor %} ] 
+        ssl => true
+        ssl_certificate_verification => false
+        manage_template => false
+        cacert => "/usr/share/logstash/config/ESca.crt"
+        user => "filebeat_writter"
+        password => "tckTHOXugBr3X9F9"
+        index => "logstash-%{[index_tag]}-%{+YYYY.MM.dd}"
+    }
+
+}
