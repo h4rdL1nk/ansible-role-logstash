@@ -63,6 +63,8 @@
       SERVICE_TYPE: logstash 
       SERVICE_OWNER: infra
       SERVICE_LABEL: clusterpre
+    published_ports:
+      - "{{ logstash_network_address }}:{{ logstash_network_port }}:5044"
     env:
       LOGSTASH_KEYSTORE_PASS: "{{ secrets.logstash.keystore.password }}"
     volumes:
