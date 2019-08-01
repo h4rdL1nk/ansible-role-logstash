@@ -1,0 +1,15 @@
+---
+
+logstash_docker_image: registry.smartdigits.io/infra/logstash
+logstash_docker_tag: 7.3.0
+logstash_docker_container_user_uid: 1000
+logstash_docker_container_group_uid: 1000
+logstash_group: logstash
+logstash_network_port: 5044
+logstash_network_name: DOCKER_MGMT
+logstash_keystore_pass: test
+logstash_pipelines:
+  - docker_micro
+logstash_config_dir: /var/dockershared/logstash/config
+logstash_data_dir: /var/dockershared/logstash/data
+logstash_secrets_file: vault/secrets.yml

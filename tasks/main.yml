@@ -1,0 +1,71 @@
+---
+
+- name: Create logstash directories
+  file:
+    state: directory
+    path: "{{ item }}"
+    recurse: True
+    owner: "{{ logstash_docker_container_user_uid }}"
+    group: "{{ logstash_docker_container_group_uid }}"
+  with_items:
+    - "{{ logstash_config_dir }}"
+    - "{{ logstash_data_dir }}"
+
+- name: Copy SSL certificates
+  copy:
+    src: "{{ lookup('env', 'PWD') }}/{{ elasticsearch_local_certificates_dir|default('files/elasticsearch/certificates')}}/{{ item }}"
+    dest: "{{ logstash_config_dir }}/{{ item }}"
+    mode: 0440
+    owner: "{{ logstash_docker_container_user_uid }}"
+    group: "{{ logstash_docker_container_group_uid }}"
+  with_items:
+    - "{{ elasticsearch_certificate_ca_file_ingest }}"
+    - "{{ elasticsearch_certificate_ca_file_monitoring }}"
+
+- name: Load logstash secrets
+  include_vars:
+    file: "{{ lookup('env', 'PWD') }}/{{ logstash_secrets_file|default('vault/secrets.yml')}}"
+
+- name: Copy logstash configuration
+  template:
+    src: logstash.j2
+    dest: "{{ logstash_config_dir }}/logstash.yml"
+    owner: "{{ logstash_docker_container_user_uid }}"
+    group: "{{ logstash_docker_container_group_uid }}"
+  register: logstash_config
+
+- name: Create logstash keystore
+  command: "docker run --rm -i -e LOGSTASH_KEYSTORE_PASS={{ secrets.logstash.keystore.password }} -v {{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z {{ logstash_docker_image }}:{{ logstash_docker_tag }} logstash-keystore --path.settings /usr/share/logstash/config create"
+  args:
+    creates: "{{ logstash_config_dir }}/logstash.keystore"
+  register: keystore_create
+
+#- name: Add filebeat keystore keys
+#  command: "docker run --rm -i -e LOGSTASH_KEYSTORE_PASS={{ logstash.keystore.pass }} -v {{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z --user root {{ logstash.docker.image}}:{{ logstash.docker.tag }} logstash-keystore add --stdin {{ item.key }}"
+#  args:
+#    stdin: "{{ item.value }}"
+#  with_dict: "{{ secrets.logstash.keystore.values }}"
+#  when: keystore_create.changed
+
+- name: Deploy logstash containers
+  docker_container:
+    state: started
+    restart: "{{ logstash_config.changed or keystore_create.changed }}"
+    name: "smd_infra_logstash"
+    image: "{{ logstash_docker_image }}:{{ logstash_docker_tag }}"
+    detach: true
+    restart_policy: unless-stopped
+    log_driver: json-file
+    log_options:
+      max-size: '30m'
+      max-file: '3'
+    labels:
+      SERVICE_TYPE: logstash 
+      SERVICE_OWNER: infra
+      SERVICE_LABEL: clusterpre
+    env:
+      LOGSTASH_KEYSTORE_PASS: "{{ secrets.logstash.keystore.password }}"
+    volumes:
+      - "{{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z"
+      - "{{ logstash_data_dir }}:/usr/share/logstash/data:rw,Z"
+    command: "--node.name logstash-{{ ansible_hostname }}"
