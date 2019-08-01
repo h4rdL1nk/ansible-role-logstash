@@ -7,7 +7,7 @@ input {
 
 filter {
     if [container] {
-        add_tag => [ "logstash_modified" ]
+        mutate { add_tag => [ "logstash_modified" ] }
     }  
 }
 
@@ -19,8 +19,8 @@ output {
         ssl_certificate_verification => false
         manage_template => false
         cacert => "/usr/share/logstash/config/ESca.crt"
-        user => "filebeat_writter"
-        password => "tckTHOXugBr3X9F9"
+        user => "logstash_writter"
+        password => "kog7gueN"
         index => "logstash-%{[index_tag]}-%{+YYYY.MM.dd}"
     }
 
