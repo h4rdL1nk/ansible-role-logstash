@@ -6,7 +6,9 @@ input {
 }
 
 filter {
-  
+    if [container] {
+        add_tag => [ "logstash_modified" ]
+    }  
 }
 
 output {
