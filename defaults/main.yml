@@ -8,8 +8,9 @@ logstash_group: logstash
 logstash_network_port: 5044
 logstash_network_name: DOCKER_MGMT
 logstash_keystore_pass: test
-logstash_pipelines:
-  - docker_micro
 logstash_config_dir: /var/dockershared/logstash/config
 logstash_data_dir: /var/dockershared/logstash/data
 logstash_secrets_file: vault/secrets.yml
+logstash_cental_management_enabled: false
+logstash_cental_management_pipelines:
+  - docker_micro
