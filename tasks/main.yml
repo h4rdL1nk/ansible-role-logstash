@@ -13,7 +13,7 @@
 
 - name: Copy SSL certificates
   copy:
-    src: "{{ lookup('env', 'PWD') }}/{{ elasticsearch_local_certificates_dir|default('files/elasticsearch/certificates')}}/{{ item }}"
+    src: "{{ elasticsearch_certificate_local_dir|default('files/elasticsearch/certificates')}}/{{ item }}"
     dest: "{{ logstash_config_dir }}/{{ item }}"
     mode: 0440
     owner: "{{ logstash_docker_container_user_uid }}"
