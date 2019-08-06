@@ -3,7 +3,7 @@ input {
     port => {{ logstash_network_port }}
     ssl => true
     ssl_certificate => "/usr/share/logstash/config/{{ logstash_certificate_auth_cert }}"
-    ssl_key => "/usr/share/logstash/config/{{ logstash_certificate_auth_cert }}"
+    ssl_key => "/usr/share/logstash/config/{{ logstash_certificate_auth_key }}"
     ssl_verify_mode => "none"
   }
 }
