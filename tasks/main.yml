@@ -37,7 +37,7 @@
 - name: Create pipelines
   template:
     src: "pipelines/{{ item }}.j2"
-    dest: "/tmp/logstash-pipeline-{{ item.yml }}"
+    dest: "/tmp/logstash-pipeline-{{ item }}.yml"
   with_items:
     - docker_micro
 
