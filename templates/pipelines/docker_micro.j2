@@ -26,8 +26,8 @@ output {
       ssl_certificate_verification => false
       manage_template => false
       cacert => "/usr/share/logstash/config/{{ elasticsearch_certificate_ca_file_ingest|default('ESca.crt') }}"
-      user => "{{ secrets.logstash.secrets.logstash.es_management_user }}"
-      password => "{{ secrets.logstash.secrets.logstash.es_management_pass }}"
+      user => "{{ secrets.logstash.es_management_user }}"
+      password => "{{ secrets.logstash.es_management_pass }}"
       index => "logstash-%{[index_tag]}-%{+YYYY.MM.dd}"
   }
 
