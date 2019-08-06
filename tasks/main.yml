@@ -34,6 +34,13 @@
     group: "{{ logstash_docker_container_group_uid }}"
   register: logstash_config
 
+- name: Create pipelines
+  template:
+    src: "pipelines/{{ item }}.j2"
+    dest: "/tmp/logstash-pipeline-{{ item.yml }}"
+  with_items:
+    - docker_micro
+
 - name: Create logstash keystore
   command: "docker run --rm -i -e LOGSTASH_KEYSTORE_PASS={{ secrets.logstash.keystore.password }} -v {{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z {{ logstash_docker_image }}:{{ logstash_docker_tag }} logstash-keystore --path.settings /usr/share/logstash/config create"
   args:
