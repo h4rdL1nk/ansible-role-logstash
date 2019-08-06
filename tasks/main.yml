@@ -22,6 +22,18 @@
     - "{{ elasticsearch_certificate_ca_file_ingest }}"
     - "{{ elasticsearch_certificate_ca_file_monitoring }}"
 
+- name: Copy logstash auth certificates
+  copy:
+    src: "{{ logstash_certificate_local_dir|default('files/logstash/certificates')}}/{{ item }}"
+    dest: "{{ logstash_config_dir }}/{{ item }}"
+    mode: 0440
+    owner: "{{ logstash_docker_container_user_uid }}"
+    group: "{{ logstash_docker_container_group_uid }}"
+  with_items:
+    - "{{ logstash_certificate_auth_cert }}"
+    - "{{ logstash_certificate_auth_key }}"
+  when: logstash_certificate_auth_copy
+
 - name: Load logstash secrets
   include_vars:
     file: "{{ lookup('env', 'PWD') }}/{{ logstash_secrets_file|default('vault/secrets.yml')}}"
