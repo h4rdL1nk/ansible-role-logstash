@@ -16,3 +16,6 @@ xpack.management.pipeline.id: [ {% for pipeline in logstash_cental_management_pi
 #xpack.monitoring.elasticsearch.password: ${LOGSTASH_SYSTEM_PASS}
 #xpack.monitoring.collection.interval: 5s
 #xpack.monitoring.elasticsearch.ssl.certificate_authority: "/usr/share/logstash/config/"
+
+dead_letter_queue:
+    enable: true
