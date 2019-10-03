@@ -81,7 +81,7 @@
     labels:
       SERVICE_TYPE: logstash 
       SERVICE_OWNER: infra
-      SERVICE_LABEL: clusterpre
+      SERVICE_LABEL: "{{ logstash_cluster_name|default(elasticsearch_cluster_name) }}" 
     published_ports:
       - "{{ logstash_network_address }}:{{ logstash_network_port }}:5044"
     env:
