@@ -17,6 +17,18 @@ filter {
     }
 }
 
+filter {
+    if [agent][type] == "metricbeat" {
+        mutate { 
+            add_field => { "index_name" => "metricbeat-%{[agent][version]}-%{+YYYY.MM.dd}" } 
+        }   
+    } else {
+	mutate { 
+	    add_field => { "index_name" => "logstash-%{[index_tag]}-%{+YYYY.MM.dd}" } 
+	}
+    }
+}
+
 output {
 
   elasticsearch {
@@ -27,7 +39,7 @@ output {
       cacert => "/usr/share/logstash/config/{{ elasticsearch_certificate_ca_file_ingest|default('ESca.crt') }}"
       user => "{{ secrets.logstash.es_management_user }}"
       password => "{{ secrets.logstash.es_management_pass }}"
-      index => "logstash-%{[index_tag]}-%{+YYYY.MM.dd}"
+      index => "%{[index_name]}"
   }
 
 }
