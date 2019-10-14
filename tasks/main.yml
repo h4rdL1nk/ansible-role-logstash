@@ -52,6 +52,8 @@
     dest: "/tmp/logstash-pipeline-{{ item }}.yml"
   when: kibana_logstash_pipeline_enable
   with_items: "{{ logstash_cental_management_pipelines }}"
+  become: false
+  delegate_to: localhost
 
 - name: Configure pipelines through kibana API
   uri: 
@@ -63,7 +65,7 @@
     remote_src: True
     return_content: True
     headers:
-      kbn-version: "{{ kibana_docker_tag|default('7.4.0') }}"
+      kbn-version: "{{ kibana_docker_tag }}"
     body_format: json
     body: |
       {
