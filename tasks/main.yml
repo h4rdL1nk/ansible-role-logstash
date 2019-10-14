@@ -50,8 +50,30 @@
   template:
     src: "pipelines/{{ item }}.j2"
     dest: "/tmp/logstash-pipeline-{{ item }}.yml"
-  with_items:
-    - docker_micro
+  when: kibana_logstash_pipeline_enable
+  with_items: "{{ logstash_cental_management_pipelines }}"
+
+- name: Configure pipelines through kibana API
+  uri: 
+    method: PUT
+    force_basic_auth: True
+    url_username: elastic
+    url_password: "{{ secrets.elasticsearch.users.elastic }}"
+    url: "http://{{ kibana_network_address }}:{{ kibana_network_port|default('5601') }}/{{ kibana_logstash_pipeline_endpoint }}/{{ item }}"
+    remote_src: True
+    return_content: True
+    headers:
+      kbn-version: "{{ kibana_docker_tag|default('7.4.0') }}"
+    body_format: json
+    body: |
+      {
+        "pipeline": "{{ lookup( 'file', '/tmp/logstash-pipeline-' + item + '.yml' )|regex_replace('\n','\\n')|regex_replace('\"','\\"') }}"
+      }
+    status_code: ['200','204']
+  when: kibana_logstash_pipeline_enable
+  run_once: True
+  with_items: "{{ logstash_cental_management_pipelines }}"
+  register: uri_out
 
 - name: Create logstash keystore
   command: "docker run --rm -i -e LOGSTASH_KEYSTORE_PASS={{ secrets.logstash.keystore.password }} -v {{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z {{ logstash_docker_image }}:{{ logstash_docker_tag }} logstash-keystore --path.settings /usr/share/logstash/config create"

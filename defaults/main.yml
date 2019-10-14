@@ -19,3 +19,6 @@ logstash_secrets_file: vault/secrets.yml
 logstash_cental_management_enabled: True
 logstash_cental_management_pipelines:
   - docker_micro
+
+kibana_logstash_pipeline_enable: false
+kibana_logstash_pipeline_endpoint: api/logstash/pipeline
