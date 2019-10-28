@@ -19,3 +19,7 @@ xpack.management.pipeline.id: [ {% for pipeline in logstash_cental_management_pi
 
 dead_letter_queue:
     enable: true
+
+http:
+  host: 0.0.0.0
+  port: {{ logstash_api_port }}
