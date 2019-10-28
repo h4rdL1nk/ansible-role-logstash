@@ -108,6 +108,7 @@
       SERVICE_LABEL: "{{ logstash_cluster_name|default(elasticsearch_cluster_name) }}" 
     published_ports:
       - "{{ logstash_network_address }}:{{ logstash_network_port }}:5044"
+      - "{{ logstash_network_address }}:{{ logstash_network_port }}:9600"
     env:
       LOGSTASH_KEYSTORE_PASS: "{{ secrets.logstash.keystore.password }}"
     volumes:
