@@ -6,6 +6,7 @@ logstash_docker_container_user_uid: 1000
 logstash_docker_container_group_uid: 1000
 logstash_group: logstash
 logstash_network_port: 5044
+logstash_api_port: 9600
 logstash_network_name: DOCKER_BACKEND
 logstash_keystore_pass: test
 logstash_certificate_local_dir: files/logstash/certificates
