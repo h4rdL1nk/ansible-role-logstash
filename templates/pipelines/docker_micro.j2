@@ -29,6 +29,16 @@ filter {
     }
 }
 
+filter {
+    fingerprint {
+        source => [ "message", "@timestamp" ]
+        target => "[@metadata][fingerprint]"
+        method => "SHA1"
+        key => "12345678"
+        concatenate_sources => true
+    }
+}
+
 output {
 
   elasticsearch {
@@ -40,6 +50,7 @@ output {
       user => "{{ secrets.logstash.es_management_user }}"
       password => "{{ secrets.logstash.es_management_pass }}"
       index => "%{[index_name]}"
+      document_id => "%{[@metadata][fingerprint]}"
   }
 
 }
