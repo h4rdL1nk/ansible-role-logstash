@@ -263,7 +263,8 @@ filter {
 filter {
 
     if [agent][type] == "metricbeat" { mutate { add_field => { "index_name" => "metricbeat-%{[agent][version]}-%{+YYYY.MM.dd}" } } }
-    else { mutate { add_field => { "index_name" => "logstash-%{[index_tag]}-%{+YYYY.MM.dd}" } }	}
+    else if [agent][type] == "filebeat" { mutate { add_field => { "index_name" => "logstash-%{[index_tag]}-%{+YYYY.MM.dd}" } }	}
+    else { mutate { add_field => { "index_name" => "heartbeat-%{[agent][version]}-%{+YYYY.MM.dd}" } } }
 
 }
 
