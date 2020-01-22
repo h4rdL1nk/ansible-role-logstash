@@ -268,14 +268,25 @@ filter {
 
 }
 
-### FILTER FOR UNIQUE EVENT IDS
+### GENERATE UNIQUE DOCUMENT ID
 filter {
-    fingerprint {
-        source => [ "message", "@timestamp" ]
-        target => "[@metadata][fingerprint]"
-        method => "SHA256"
-        key => "12345678"
-        concatenate_sources => true
+    if [agent][type] == "filebeat" {
+        fingerprint {
+            source => [ "message", "@timestamp" ]
+            target => "[@metadata][fingerprint]"
+            method => "SHA256"
+            key => "12345678"
+            concatenate_sources => true
+        }
+    }
+    else {
+        fingerprint {
+            source => [ "agent", "metricset", "container", "@timestamp" ]
+            target => "[@metadata][fingerprint]"
+            method => "SHA256"
+            key => "12345678"
+            concatenate_sources => true
+        }
     }
 }
 
