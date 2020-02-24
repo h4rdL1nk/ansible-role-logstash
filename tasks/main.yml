@@ -49,7 +49,7 @@
   include_vars:
     file: "{{ lookup('env', 'PWD') }}/{{ logstash_secrets_file|default('vault/secrets.yml')}}"
   tags:
-    - configuration
+    - deploy
 
 - name: Copy logstash configuration
   template:
