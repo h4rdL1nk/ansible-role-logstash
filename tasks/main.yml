@@ -10,6 +10,9 @@
   with_items:
     - "{{ logstash_config_dir }}"
     - "{{ logstash_data_dir }}"
+  tags:
+    - configuration
+    - files
 
 - name: Copy SSL certificates
   copy:
@@ -21,6 +24,10 @@
   with_items:
     - "{{ elasticsearch_certificate_ca_file_ingest }}"
     - "{{ elasticsearch_certificate_ca_file_monitoring }}"
+  tags:
+    - configuration
+    - files
+    - certificates
 
 - name: Copy logstash auth certificates
   copy:
@@ -33,10 +40,16 @@
     - "{{ logstash_certificate_auth_cert }}"
     - "{{ logstash_certificate_auth_key }}"
   when: logstash_certificate_auth_copy
+  tags:
+    - configuration
+    - files
+    - certificates
 
 - name: Load logstash secrets
   include_vars:
     file: "{{ lookup('env', 'PWD') }}/{{ logstash_secrets_file|default('vault/secrets.yml')}}"
+  tags:
+    - configuration
 
 - name: Copy logstash configuration
   template:
@@ -45,6 +58,9 @@
     owner: "{{ logstash_docker_container_user_uid }}"
     group: "{{ logstash_docker_container_group_uid }}"
   register: logstash_config
+  tags:
+    - configuration
+    - files
 
 - name: Create pipelines
   template:
@@ -54,6 +70,10 @@
   with_items: "{{ logstash_cental_management_pipelines }}"
   become: false
   delegate_to: localhost
+  tags:
+    - configuration
+    - files
+    - pipelines
 
 - name: Configure pipelines through kibana API
   uri: 
@@ -79,12 +99,20 @@
   until: uri_out.status == 200 or uri_out.status == 204
   delay: 5
   retries: 40
+  tags:
+    - configuration
+    - api
+    - pipelines
 
 - name: Create logstash keystore
   command: "docker run --rm -i -e LOGSTASH_KEYSTORE_PASS={{ secrets.logstash.keystore.password }} -v {{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z {{ logstash_docker_image }}:{{ logstash_docker_tag }} logstash-keystore --path.settings /usr/share/logstash/config create"
   args:
     creates: "{{ logstash_config_dir }}/logstash.keystore"
   register: keystore_create
+  tags:
+    - configuration
+    - files
+    - keystore
 
 #- name: Add filebeat keystore keys
 #  command: "docker run --rm -i -e LOGSTASH_KEYSTORE_PASS={{ logstash.keystore.pass }} -v {{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z --user root {{ logstash.docker.image}}:{{ logstash.docker.tag }} logstash-keystore add --stdin {{ item.key }}"
@@ -96,7 +124,7 @@
 - name: Deploy logstash containers
   docker_container:
     state: started
-    restart: "{{ logstash_config.changed or keystore_create.changed }}"
+    restart: "{{ (logstash_config is defined and logstash_config.changed) or (keystore_create is defined and keystore_create.changed) }}"
     name: "smd_infra_logstash"
     image: "{{ logstash_docker_image }}:{{ logstash_docker_tag }}"
     detach: true
@@ -118,3 +146,5 @@
       - "{{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z"
       - "{{ logstash_data_dir }}:/usr/share/logstash/data:rw,Z"
     command: "--node.name logstash-{{ ansible_hostname }}"
+  tags:
+    - deploy
