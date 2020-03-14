@@ -51,6 +51,10 @@
   tags:
     - deploy
 
+- name: Get pipelines list
+  set_fact:
+    logstash_kibana_pipeline_templates_names: []
+
 - name: Copy logstash configuration
   template:
     src: logstash.j2
