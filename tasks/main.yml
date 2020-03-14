@@ -96,19 +96,23 @@
       {
         "pipeline": "{{ lookup( 'file', item ) | regex_replace('\n','\\n') | regex_replace('\"','\\"') }}"
       }
-    status_code: [ 200, 204 ]
+    status_code: [ 200, 204, 403 ]
   when: logstash_kibana_pipeline_enable
   run_once: True
   with_fileglob:
     - "{{ logstash_kibana_pipeline_templates_dest }}/*.pipeline"
   register: uri_out
-  until: uri_out.status == 200 or uri_out.status == 204
+  until: uri_out.status in [ 200, 204, 403 ]
   delay: 5
   retries: 40
   tags:
     - configuration
     - api
     - pipelines
+
+- debug:
+    msg: "Logstash API disabled for Basic license"
+  when: uri_out.status is defined and uri_out.status in [ 403 ] 
 
 - name: Create logstash keystore
   command: "docker run --rm -i -e LOGSTASH_KEYSTORE_PASS={{ secrets.logstash.keystore.password }} -v {{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z {{ logstash_docker_image }}:{{ logstash_docker_tag }} logstash-keystore --path.settings /usr/share/logstash/config create"
