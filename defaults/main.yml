@@ -14,6 +14,7 @@ logstash_certificate_auth_copy: False
 logstash_certificate_auth_cert: server.crt
 logstash_certificate_auth_key: server.key
 logstash_config_dir: /var/dockershared/logstash/config
+logstash_config_pipelines_dir: /var/dockershared/logstash/config/pipelines
 logstash_data_dir: /var/dockershared/logstash/data
 logstash_cluster_name: default
 logstash_secrets_file: vault/secrets.yml
