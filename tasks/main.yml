@@ -89,6 +89,7 @@
   with_fileglob:
     - "{{ logstash_kibana_pipeline_templates_dest }}/*.pipeline"
   when: not logstash_kibana_pipeline_enable
+  register: logstash_pipelines_copy
 
 - name: Configure pipeline local config
   copy:
@@ -100,6 +101,7 @@
       {% endfor %}
     dest: "{{ logstash_config_dir }}/pipelines.yml"
   when: not logstash_kibana_pipeline_enable and create_pipeline_files.results is defined and create_pipeline_files.results | length > 0
+  register: logstash_pipelines_file
 
 - name: Configure pipelines through kibana API
   uri: 
@@ -155,7 +157,7 @@
 - name: Deploy logstash containers
   docker_container:
     state: started
-    restart: "{{ (logstash_config is defined and logstash_config.changed) or (keystore_create is defined and keystore_create.changed) }}"
+    restart: "{{ (logstash_config is defined and logstash_config.changed) or (keystore_create is defined and keystore_create.changed) or ( logstash_pipelines_copy is defined and logstash_pipelines_copy.changed ) or ( logstash_pipelines_file is defined and logstash_pipelines_file.changed ) }}"
     name: "smd_infra_logstash"
     image: "{{ logstash_docker_image }}:{{ logstash_docker_tag }}"
     detach: true
