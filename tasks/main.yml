@@ -95,7 +95,7 @@
     content: |
       {% for pipeline in logstash_kibana_pipeline_templates_names %}
       - pipeline.id: {{ pipeline }}
-        path.config: "{{ logstash_config_pipelines_dir }}/{{ pipeline }}.pipeline"
+        path.config: "/usr/share/logstash/config/pipelines/{{ pipeline }}.pipeline"
         pipeline.workers: 3
       {% endfor %}
     dest: "{{ logstash_config_dir }}/pipelines.yml"
