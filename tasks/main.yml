@@ -86,7 +86,7 @@
     force_basic_auth: True
     url_username: elastic
     url_password: "{{ secrets.elasticsearch.users.elastic }}"
-    url: "http://{{ kibana_network_address }}:{{ kibana_network_port|default('5601') }}/{{ logstash_kibana_pipeline_endpoint }}/{{ item }}"
+    url: "http://{{ kibana_network_address }}:{{ kibana_network_port|default('5601') }}/{{ logstash_kibana_pipeline_endpoint }}/{{ item | basename | regex_replace('.j2$', '') }}"
     remote_src: True
     return_content: True
     headers:
