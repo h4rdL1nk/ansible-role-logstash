@@ -24,6 +24,7 @@ logstash_deadletter_maxbytes: 1024mb
 kibana_logstash_pipeline_enable: False
 
 logstash_kibana_pipeline_enable: False
+logstash_kibana_version: 7.6.1
 logstash_kibana_pipeline_endpoint: api/logstash/pipeline
 logstash_kibana_pipeline_templates_dir: templates/pipelines
 logstash_kibana_pipeline_templates_dest: /tmp

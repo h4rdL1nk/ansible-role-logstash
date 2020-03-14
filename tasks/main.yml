@@ -86,7 +86,7 @@
     remote_src: True
     return_content: True
     headers:
-      kbn-version: "{{ kibana_docker_tag }}"
+      kbn-version: "{{ logstash_kibana_version }}"
     body_format: json
     body: |
       {
