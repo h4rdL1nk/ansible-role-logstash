@@ -69,6 +69,7 @@
 - name: Get pipelines list
   set_fact:
     logstash_kibana_pipeline_templates_names: "{{ create_pipeline_files.results | map(attribute='item') | map('regex_replace', '^.*/([a-zA-Z_-]+).j2$', '\\1') | list }}"
+  when: create_pipeline_files.results is defined and create_pipeline_files.results | length > 0
 
 - name: Copy logstash configuration
   template:
@@ -81,13 +82,24 @@
     - configuration
     - files
 
-- name: Configure pipelines local files
+- name: Configure pipeline local files
   copy:
     src: "{{ item }}"
     dest: "{{ logstash_config_pipelines_dir }}"
   with_fileglob:
     - "{{ logstash_kibana_pipeline_templates_dest }}/*.pipeline"
   when: not logstash_kibana_pipeline_enable
+
+- name: Configure pipeline local config
+  copy:
+    content: |
+      {% for pipeline in logstash_kibana_pipeline_templates_names %}
+      - pipeline.id: {{ pipeline }}
+        path.config: "{{ logstash_config_pipelines_dir }}/{{ pipeline }}.pipeline"
+        pipeline.workers: 3
+      {% endfor %}
+    dest: "{{ logstash_config_dir }}/pipelines.yml"
+  when: not logstash_kibana_pipeline_enable and create_pipeline_files.results is defined and create_pipeline_files.results | length > 0
 
 - name: Configure pipelines through kibana API
   uri: 
