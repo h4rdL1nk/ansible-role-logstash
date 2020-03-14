@@ -64,11 +64,12 @@
 
 - name: Create pipelines
   template:
-    src: "pipelines/{{ item }}.j2"
-    dest: "/tmp/logstash-pipeline-{{ item }}.yml"
-  when: kibana_logstash_pipeline_enable
-  with_items: "{{ logstash_cental_management_pipelines }}"
-  become: false
+    src: "{{ item }}"
+    dest: "{{ logstash_kibana_pipeline_templates_dest }}/{{ item | basename | regex_replace('.j2$', '.pipeline') }}"
+  when: logstash_kibana_pipeline_enable
+  with_fileglob:
+    - "{{ logstash_kibana_pipeline_templates_dir }}/*.j2"
+  become: False
   delegate_to: localhost
   tags:
     - configuration
@@ -81,7 +82,7 @@
     force_basic_auth: True
     url_username: elastic
     url_password: "{{ secrets.elasticsearch.users.elastic }}"
-    url: "http://{{ kibana_network_address }}:{{ kibana_network_port|default('5601') }}/{{ kibana_logstash_pipeline_endpoint }}/{{ item }}"
+    url: "http://{{ kibana_network_address }}:{{ kibana_network_port|default('5601') }}/{{ logstash_kibana_pipeline_endpoint }}/{{ item }}"
     remote_src: True
     return_content: True
     headers:
@@ -89,12 +90,13 @@
     body_format: json
     body: |
       {
-        "pipeline": "{{ lookup( 'file', '/tmp/logstash-pipeline-' + item + '.yml' )|regex_replace('\n','\\n')|regex_replace('\"','\\"') }}"
+        "pipeline": "{{ lookup( 'file', item ) | regex_replace('\n','\\n') | regex_replace('\"','\\"') }}"
       }
-    status_code: ['200','204']
-  when: kibana_logstash_pipeline_enable
+    status_code: [ 200, 204 ]
+  when: logstash_kibana_pipeline_enable
   run_once: True
-  with_items: "{{ logstash_cental_management_pipelines }}"
+  with_fileglob:
+    - "{{ logstash_kibana_pipeline_templates_dest }}/*.pipeline"
   register: uri_out
   until: uri_out.status == 200 or uri_out.status == 204
   delay: 5

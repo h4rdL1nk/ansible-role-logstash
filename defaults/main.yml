@@ -17,12 +17,13 @@ logstash_config_dir: /var/dockershared/logstash/config
 logstash_data_dir: /var/dockershared/logstash/data
 logstash_cluster_name: default
 logstash_secrets_file: vault/secrets.yml
-logstash_cental_management_enabled: True
-logstash_cental_management_pipelines:
-  - docker_micro
 
-logstash_deadletter_enable: false
+logstash_deadletter_enable: False
 logstash_deadletter_maxbytes: 1024mb
 
-kibana_logstash_pipeline_enable: false
-kibana_logstash_pipeline_endpoint: api/logstash/pipeline
+kibana_logstash_pipeline_enable: False
+
+logstash_kibana_pipeline_enable: False
+logstash_kibana_pipeline_endpoint: api/logstash/pipeline
+logstash_kibana_pipeline_templates_dir: templates/pipelines
+logstash_kibana_pipeline_templates_dest: /tmp
