@@ -83,7 +83,7 @@
 
 - name: Configure pipelines local files
   copy:
-    src: "{{ logstash_kibana_pipeline_templates_dest }}"
+    src: "{{ item }}"
     dest: "{{ logstash_config_pipelines_dir }}"
   with_fileglob:
     - "{{ logstash_kibana_pipeline_templates_dest }}/*.pipeline"
