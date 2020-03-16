@@ -120,13 +120,13 @@
       {
         "pipeline": "{{ lookup( 'file', item ) | regex_replace('\n','\\n') | regex_replace('\"','\\"') }}"
       }
-    status_code: [ 200, 204, 403 ]
+    status_code: [ 200, 204 ]
   when: logstash_kibana_pipeline_enable
   run_once: True
   with_fileglob:
     - "{{ logstash_kibana_pipeline_templates_dest }}/*.pipeline"
   register: uri_out
-  until: uri_out.status in [ 200, 204, 403 ]
+  until: uri_out.status in [ 200, 204 ]
   delay: 5
   retries: 40
   tags:
