@@ -171,9 +171,10 @@
       SERVICE_TYPE: logstash 
       SERVICE_OWNER: infra
       SERVICE_LABEL: "{{ logstash_cluster_name|default(elasticsearch_cluster_name) }}" 
-    published_ports:
-      - "{{ logstash_network_address }}:{{ logstash_network_port }}:5044"
-      - "{{ logstash_network_address }}:{{ logstash_api_port }}:9600"
+    #published_ports:
+    #  - "{{ logstash_network_address }}:{{ logstash_network_port }}:5044"
+    #  - "{{ logstash_network_address }}:{{ logstash_api_port }}:9600"
+    published_ports: "{{ logstash_network_ports | map('regex_replace','^(.*)$', logstash_network_address + ':\\1:\\1') | list }}"
     env:
       LOGSTASH_KEYSTORE_PASS: "{{ secrets.logstash.keystore.password }}"
     volumes:
