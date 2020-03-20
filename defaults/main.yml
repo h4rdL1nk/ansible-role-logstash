@@ -4,6 +4,10 @@ logstash_docker_image: registry.smartdigits.io/infra/logstash
 logstash_docker_tag: 7.3.0
 logstash_docker_container_user_uid: 1000
 logstash_docker_container_group_uid: 1000
+#logstash_docker_container_memory: 1024
+logstash_docker_container_cpu_period: 100000
+logstash_docker_container_cpu_quota: 0
+logstash_docker_container_cpu_count: 1
 logstash_group: logstash
 logstash_network_port: 5044
 logstash_api_port: 9600
