@@ -1,6 +1,8 @@
 
 {% if logstash_set_cluster_uuid %}
-monitoring.cluster_uuid: "{{ logstash_cluster_uuid }}"
+# Metricbeat monitoring settings
+#monitoring.cluster_uuid: "{{ logstash_cluster_uuid }}"
+xpack.monitoring.enabled: false
 {% endif %}
 
 xpack.management.enabled: {{ logstash_kibana_pipeline_enable }}
