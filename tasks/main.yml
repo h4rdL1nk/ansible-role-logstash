@@ -72,6 +72,23 @@
     logstash_kibana_pipeline_templates_names: "{{ create_pipeline_files.results | map(attribute='item') | map('regex_replace', '^.*/([a-zA-Z_-]+).j2$', '\\1') | list }}"
   when: create_pipeline_files.results is defined and create_pipeline_files.results | length > 0
 
+- name: Get elasticsearch cluster UUID
+  uri: 
+    method: GET
+    url_username: elastic
+    url_password: "{{ secrets.elasticsearch.users.elastic }}"
+    url: "{% if elasticsearch_security_http_enabled %}https{% else %}http{% endif %}://{{ elasticsearch_cluster_network_addresses[0] }}:{{ elasticsearch_network_port }}"
+    remote_src: True
+    return_content: True
+    validate_certs: False
+  when: logstash_set_cluster_uuid 
+  register: cluster_uuid
+  
+- name: Set cluster UUID variable
+  set_fact:
+    logstash_cluster_uuid: "{{ cluster_uuid.json.cluster_uuid }}"
+  when: logstash_set_cluster_uuid
+
 - name: Copy logstash configuration
   template:
     src: logstash.j2

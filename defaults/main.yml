@@ -9,6 +9,8 @@ logstash_docker_container_cpu_period: 100000
 logstash_docker_container_cpu_quota: 0
 logstash_docker_container_cpu_count: 1
 logstash_group: logstash
+logstash_set_cluster_uuid: true 
+logstash_cluster_uuid: dummy
 logstash_network_port: 5044
 logstash_api_port: 9600
 logstash_network_ports: [ 5044, 5045, 5046, 9600 ]
