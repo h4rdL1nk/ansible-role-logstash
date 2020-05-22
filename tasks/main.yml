@@ -179,6 +179,7 @@
     name: "smd_infra_logstash"
     image: "{{ logstash_docker_image }}:{{ logstash_docker_tag }}"
     detach: true
+    cpu_period: "{{ logstash_docker_container_cpu_period }}"
     cpu_quota: "{{ ( logstash_docker_container_cpu_period * logstash_docker_container_cpu_count ) | int }}"
     memory: "{{ logstash_docker_container_memory | default( ( ansible_memtotal_mb / 2 ) | int ) }}m"
     restart_policy: unless-stopped
