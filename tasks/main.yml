@@ -167,8 +167,8 @@
     - keystore
 
 - name: Add filebeat keystore keys
-  command: "echo {{ item.value }} | docker run --rm -i -e LOGSTASH_KEYSTORE_PASS={{ logstash.keystore.pass }} -v {{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z --user root {{ logstash.docker.image}}:{{ logstash.docker.tag }} logstash-keystore --path.settings /usr/share/logstash/config add {{ item.key }}"
-  with_dict: "{{ secrets.logstash.keystore.values }}"
+  shell: "echo {{ item.value }} | docker run --rm -i -e LOGSTASH_KEYSTORE_PASS={{ secrets.logstash.keystore.password }} -v {{ logstash_config_dir }}:/usr/share/logstash/config:rw,Z --user root {{ logstash_docker_image }}:{{ logstash_docker_tag }} logstash-keystore --path.settings /usr/share/logstash/config add {{ item.key }}"
+  with_dict: "{{ secrets.logstash_keys }}"
   when: keystore_create.changed
 
 - name: Deploy logstash containers
