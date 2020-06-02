@@ -128,7 +128,7 @@
     force_basic_auth: True
     url_username: elastic
     url_password: "{{ secrets.elasticsearch.users.elastic }}"
-    url: "http://{{ kibana_network_address }}:{{ kibana_network_port|default('5601') }}/{{ logstash_kibana_pipeline_endpoint }}/{{ item | basename | regex_replace('.pipeline$', '') }}"
+    url: "http://{{ kibana_network_address }}:{{ kibana_network_port|default('5601') }}/{{ logstash_kibana_pipeline_endpoint }}/{{ item }}"
     remote_src: True
     return_content: True
     headers:
@@ -136,13 +136,12 @@
     body_format: json
     body: |
       {
-        "pipeline": "{{ lookup( 'file', item ) | regex_replace('\n','\\n') | regex_replace('\"','\\"') }}"
+        "pipeline": "{{ lookup( 'file', logstash_kibana_pipeline_templates_dest + "/" + item + ".pipeline" ) | regex_replace('\n','\\n') | regex_replace('\"','\\"') }}"
       }
     status_code: [ 200, 204 ]
   when: logstash_kibana_pipeline_enable
   run_once: True
-  with_fileglob:
-    - "{{ logstash_kibana_pipeline_templates_dest }}/*.pipeline"
+  with_items: "{{ logstash_kibana_pipeline_templates_names }}"
   register: uri_out
   until: uri_out.status in [ 200, 204 ]
   delay: 5
