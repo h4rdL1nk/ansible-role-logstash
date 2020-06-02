@@ -136,7 +136,7 @@
     body_format: json
     body: |
       {
-        "pipeline": "{{ lookup( 'file', logstash_kibana_pipeline_templates_dest + "/" + item + ".pipeline" ) | regex_replace('\n','\\n') | regex_replace('\"','\\"') }}"
+        "pipeline": {{ lookup( 'file', logstash_kibana_pipeline_templates_dest + "/" + item + ".pipeline" ) | to_json }}
       }
     status_code: [ 200, 204 ]
   when: logstash_kibana_pipeline_enable
