@@ -183,6 +183,7 @@
 
 - name: Deploy logstash containers
   docker_container:
+    api_version: {{ logstash_docker_api_version }}
     state: started
     restart: "{{ (logstash_config is defined and logstash_config.changed) or (keystore_create is defined and keystore_create.changed) or ( logstash_pipelines_copy is defined and logstash_pipelines_copy.changed ) or ( logstash_pipelines_file is defined and logstash_pipelines_file.changed ) or ( copy_autch_certs is defined and copy_autch_certs.changed ) }}"
     name: "smd_infra_logstash"
