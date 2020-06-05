@@ -2,7 +2,7 @@
 
 logstash_docker_image: registry.smartdigits.io/infra/logstash
 logstash_docker_tag: 7.3.0
-logstash_elasticsearch_docker_api_version: 1.22
+logstash_docker_api_version: 1.22
 logstash_docker_container_user_uid: 1000
 logstash_docker_container_group_uid: 1000
 #logstash_docker_container_memory: 1024
